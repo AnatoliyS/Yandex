@@ -1,4 +1,4 @@
-﻿/* Анатолий Селезнёв, anatoliy.seleznyov@gmail.com, архитектура решения:
+﻿/* Анатолий Селезнёв, anatoliy.seleznyov@gmail.com, https://github.com/AnatoliyS/Yandex
 
 CTimeStamp - класс Временной отметки. Например, можно создать разные временные 
 отметки для разных часовых поясов.
