@@ -81,6 +81,80 @@ public:
 	void scan(char* time_str);
 };
 
+
+class WrongFormat24Exception: public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "Неверный формат времени. Должно быть HH:MM";
+	}
+};
+
+class WrongFormat12Exception: public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "Неверный формат времени. Должно быть HH:MM AM\\PM";
+	}
+};
+
+class WrongModifierException: public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "Неверный формат модификатора AM\\PM";
+	}
+};
+
+class WrongFormat12RangeException: public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "Неверный формат времени. При указании AM\\PM часы указываются в диапазоне 0..11";
+	}
+};
+
+class WrongFormat24RangeException: public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "Неверный формат времени. Число часов <= 23, минут <= 59";
+	}
+};
+
+class MoreSymbolsException: public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "Неверный формат времени. Лишние символы в конце строки";
+	}
+};
+
+class NoArgumentsException: public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "Недостаточно аргументов";
+	}
+};
+
+class WrongAngleTypeException: public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "Неверно задан формат вывода угла. (deg\\rad\\dms)";
+	}
+};
+
+class WrongClockTypeException: public std::exception
+{
+	virtual const char* what() const throw()
+	{
+		return "Неверно задан тип часов. (mechanic\\quartz)";
+	}
+};
+
+
 // Сканирует число часов
 void CTimeStampFromString :: scanHour()
 {
@@ -98,7 +172,7 @@ void CTimeStampFromString :: scanHour()
 			scaned_symbols = 0;
 		}
 		else 
-			throw std::exception("Неверный формат времени. Должно быть HH:MM");
+			throw WrongFormat24Exception();
 	
 }
 
@@ -120,10 +194,10 @@ void CTimeStampFromString :: scanMinute()
 				scaned_symbols = 0;
 			}
 			else 
-				throw std::exception("Неверный формат модификатора AM\\PM");
+				throw WrongModifierException();
 		}
 		else 
-			throw std::exception("Неверный формат времени. Должно быть HH:MM");						
+			throw WrongFormat24Exception();						
 	}
 }
 
@@ -136,7 +210,7 @@ void CTimeStampFromString :: scanFormat()
 		if(*current_symbol == 'A' || *current_symbol == 'P')
 		{
 			if(hour > 11)
-				throw std::exception("Неверный формат. При указании AM\\PM часы указываются в диапазоне 0..11");
+				throw WrongFormat12RangeException();
 
 			if(*current_symbol == 'P')
 				hour += 12;	
@@ -144,7 +218,7 @@ void CTimeStampFromString :: scanFormat()
 			scaned_symbols++;							
 		}
 		else
-			throw std::exception("Неверный формат модификатора AM\\PM");	
+			throw WrongModifierException();	
 		return;
 	}
 
@@ -153,7 +227,7 @@ void CTimeStampFromString :: scanFormat()
 		if(*current_symbol == 'M')
 			state = scaningDone;							
 		else
-			throw std::exception("Неверный формат модификатора AM\\PM");
+			throw WrongModifierException();
 }
 
 
@@ -182,7 +256,7 @@ void CTimeStampFromString :: scan(char* time_str)
 				scanFormat();
 				break;
 			case scaningDone: // Если сканирование завершено, но не конец строки
-				throw std::exception("Неверный формат. Лишние символы в конце строки");
+				throw MoreSymbolsException();
 		}
 		current_symbol++;	
 	}
@@ -191,11 +265,11 @@ void CTimeStampFromString :: scan(char* time_str)
 	if(state != scaningDone)
 		// Если завершили сканирование в любой другой момент, кроме как перед началом чтения формата - ошибка
 		if(state != scaningMinutes || scaned_symbols != 2)
-			throw std::exception("Неверный формат. HH:MM AM\\PM");			
+			throw WrongFormat12Exception();			
 	
 
 	if(hour > 23 || minute > 59)
-		throw std::exception("Неверный формат. Число часов <= 23, минут <= 59");
+		throw WrongFormat24RangeException();
 
 }
 
@@ -210,7 +284,7 @@ CTimeStampFromString :: CTimeStampFromString(char* time_str)
 ///
 class CAngle{
 public:
-	static enum AngleOutputType { Deg, Rad, Dms }; // Тип вывода
+	enum AngleOutputType { Deg, Rad, Dms }; // Тип вывода
 	
 private:
 	double value;
@@ -230,7 +304,6 @@ public:
 	// Преобразует угол к меньшему из 2 возможных
 	void toLower();
 	void out(const AngleOutputType type);
-	char* toString(const AngleOutputType type);
 	
 };
 
@@ -278,28 +351,6 @@ void CAngle :: toLower(){
 		value = fullCircle - value;
 }
 
-// Выводит в строку (для unit-тестов)
-char* CAngle :: toString(const AngleOutputType type){
-	char* temp;
-	switch(type){
-		case Deg:
-			temp = (char*) malloc(sizeof(char)*7);
-			sprintf_s(temp, sizeof(temp), "%.4lf\n", value);
-			break;
-		case Rad:
-			temp = (char*) malloc(sizeof(char)*7);
-			sprintf_s(temp, sizeof(temp), "%.4lf\n", value*2.0*M_PI/fullCircle);
-			break;
-		case Dms:
-			temp = (char*) malloc(sizeof(char)*15);
-			sprintf_s(temp, sizeof(temp), "%d.%02.0lf'%02.0lf\"\n", int(value), 
-												(value - int(value))*minutesPerDegree, 
-												((value - int(value))*minutesPerDegree 
-												- int((value - int(value))*minutesPerDegree))*secondsPerMinute);
-	}
-	return temp;
-}
-
 // Вывести угол в соответствии с типом
 void CAngle :: out(const CAngle::AngleOutputType type){
 	switch(type){
@@ -323,7 +374,7 @@ void CAngle :: out(const CAngle::AngleOutputType type){
 ///
 class CClock{
 public:
-	static enum clockType { Mechanic, Quartz };
+	enum clockType { Mechanic, Quartz };
 
 private:
 	// Указатель на временную отметку
@@ -390,7 +441,7 @@ CAngle::AngleOutputType getAngleType(char* str){
 	if(strcmp(str, "dms") == 0)
 		return CAngle::Dms;
 
-	throw std::exception("Неверно задан формат вывода угла. (deg\\rad\\dms)");
+	throw WrongAngleTypeException();
 } 
 
 CClock::clockType getClockType(char* str){
@@ -400,32 +451,34 @@ CClock::clockType getClockType(char* str){
 	if(strcmp(str, "quartz") == 0)
 		return CClock::Quartz;
 
-	throw std::exception("Неверно задан тип часов. (mechanic\\quartz)");
+	throw WrongClockTypeException();
 } 
 
 
 int main(int argc, char** argv){
 	setlocale( LC_ALL,"Russian" );
 	
-	CTimeStamp* ts = new CTimeStamp();
-	CClock* clock = new CClock(ts, CClock::Mechanic); // Часы по умолчанию
+	CTimeStamp* ts = NULL;
+	CClock* clock = NULL;
 
 	try{
 		switch(argc){
 		case 1:
-			throw std::exception("Недостаточно аргументов");
+			throw NoArgumentsException();
 			break;
 		case 2:
-			*ts = CTimeStampFromString(argv[1]);			
+			ts = new CTimeStampFromString(argv[1]);
+			clock = new CClock(ts, CClock::Mechanic); // Часы по умолчанию
 			clock->printAngle(CAngle::Deg);			
 			break;
 		case 3:
-			*ts = CTimeStampFromString(argv[1]);			
+			ts = new CTimeStampFromString(argv[1]);
+			clock = new CClock(ts, CClock::Mechanic);
 			clock->printAngle(getAngleType(argv[2]));			
 			break;
 		default:
-			*ts = CTimeStampFromString(argv[1]);
-			clock->setClockType(getClockType(argv[3]));
+			ts = new CTimeStampFromString(argv[1]);
+			clock = new CClock(ts, getClockType(argv[3]));
 			clock->printAngle(getAngleType(argv[2]));
 		}
 	}catch(std::exception& e){
@@ -436,6 +489,7 @@ int main(int argc, char** argv){
 	delete ts;
 	delete clock;
 
-	system("pause");
+	std::cin.get();
+
 	return EXIT_SUCCESS;
 }

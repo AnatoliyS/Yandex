@@ -35,54 +35,70 @@ TEST_F(TimeStampFromStringTest, format24_basicTest3)
 }
 
 // Некорректный ввод:
-TEST_F(TimeStampFromStringTest, format24_exception_empty) 
+TEST_F(TimeStampFromStringTest, format12_exception_empty) 
 {
-	ASSERT_THROW(tsfs.scan(""), std::exception);	
+	ASSERT_THROW(tsfs.scan(""), WrongFormat12Exception);	
 }
+
+TEST_F(TimeStampFromStringTest, format24_exception_empty2) 
+{
+	ASSERT_THROW(tsfs.scan(":"), WrongFormat24Exception);	
+}
+
+TEST_F(TimeStampFromStringTest, format24_exception_symbols) 
+{
+	ASSERT_THROW(tsfs.scan("df:fg"), WrongFormat24Exception);	
+}
+
+TEST_F(TimeStampFromStringTest, format24_exception_symbols2) 
+{
+	ASSERT_THROW(tsfs.scan("qwerty"), WrongFormat24Exception);	
+}
+
 
 TEST_F(TimeStampFromStringTest, format24_exception_less_digit_in_hour) 
 {	
-	ASSERT_THROW(tsfs.scan("3:59"), std::exception);	
+	ASSERT_THROW(tsfs.scan("3:59"), WrongFormat24Exception);	
 }
 
 TEST_F(TimeStampFromStringTest, format24_exception_hour_more_23) 
 {	
-	ASSERT_THROW(tsfs.scan("24:59"), std::exception);	
+	ASSERT_THROW(tsfs.scan("24:59"), WrongFormat24RangeException);	
 }
 
 TEST_F(TimeStampFromStringTest, format24_exception_minute_more_59) 
 {	
-	ASSERT_THROW(tsfs.scan("22:60"), std::exception);	
+	ASSERT_THROW(tsfs.scan("22:60"), WrongFormat24RangeException);	
 }
 
 TEST_F(TimeStampFromStringTest, format24_exception_whitespace_1) 
 {	
-	ASSERT_THROW(tsfs.scan("13 :59"), std::exception);	
+	ASSERT_THROW(tsfs.scan("13 :59"), WrongFormat24Exception);	
 }
 
 TEST_F(TimeStampFromStringTest, format24_exception_whitespace_2) 
 {	
-	ASSERT_THROW(tsfs.scan("13: 59"), std::exception);	
+	ASSERT_THROW(tsfs.scan("13: 59"), WrongFormat24Exception);	
 }
 
 TEST_F(TimeStampFromStringTest, format24_exception_whitespace_3) 
 {	
-	ASSERT_THROW(tsfs.scan("1 3: 59"), std::exception);	
+	ASSERT_THROW(tsfs.scan("1 3: 59"), WrongFormat24Exception);	
 }
 
 TEST_F(TimeStampFromStringTest, format12_exception_modifier_one_char) 
 {	
-	ASSERT_THROW(tsfs.scan("10:11 A"), std::exception);	
+	ASSERT_THROW(tsfs.scan("10:11 A"), WrongFormat12Exception);	// оборвался формат
 }
 
 TEST_F(TimeStampFromStringTest, format12_exception_hour_more_than_11) 
 {	
-	ASSERT_THROW(tsfs.scan("13:59 AM"), std::exception);	
+	ASSERT_THROW(tsfs.scan("13:59 AM"), WrongFormat12RangeException);	
 }
 
 TEST_F(TimeStampFromStringTest, format12_exception_wrong_modifier)
 {	
-	ASSERT_THROW(tsfs.scan("13:59 AD"), std::exception);	
+	ASSERT_THROW(tsfs.scan("13:59 AD"), WrongFormat12RangeException);// так как встретили А, но часов больше 11	
 }
 
 
