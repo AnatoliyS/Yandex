@@ -77,6 +77,7 @@ public:
 	CTimeStampFromString() {};
 	CTimeStampFromString(char* time_str);
 	~CTimeStampFromString() {};
+	// Сканирует строку и получает из нее временную отметку
 	void scan(char* time_str);
 };
 
@@ -277,20 +278,21 @@ void CAngle :: toLower(){
 		value = fullCircle - value;
 }
 
+// Выводит в строку (для unit-тестов)
 char* CAngle :: toString(const AngleOutputType type){
 	char* temp;
 	switch(type){
 		case Deg:
 			temp = (char*) malloc(sizeof(char)*7);
-			sprintf(temp, "%.4lf\n", value);
+			sprintf_s(temp, sizeof(temp), "%.4lf\n", value);
 			break;
 		case Rad:
 			temp = (char*) malloc(sizeof(char)*7);
-			sprintf(temp, "%.4lf\n", value*2.0*M_PI/fullCircle);
+			sprintf_s(temp, sizeof(temp), "%.4lf\n", value*2.0*M_PI/fullCircle);
 			break;
 		case Dms:
 			temp = (char*) malloc(sizeof(char)*15);
-			sprintf(temp, "%d.%02.0lf'%02.0lf\"\n", int(value), 
+			sprintf_s(temp, sizeof(temp), "%d.%02.0lf'%02.0lf\"\n", int(value), 
 												(value - int(value))*minutesPerDegree, 
 												((value - int(value))*minutesPerDegree 
 												- int((value - int(value))*minutesPerDegree))*secondsPerMinute);

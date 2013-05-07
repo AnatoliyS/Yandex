@@ -1,12 +1,14 @@
-#include <cstdlib>
+﻿#include <cstdlib>
 #include "gtest/gtest.h"
 
-// ���, ����� ������������ main � ����������� ���������
+// Хак, чтобы игнорировать main в тестируемой программе
 #define main MainInTestedFile
 #include "../../Yandex/main.cpp"
 #define main main
 
-
+///
+/// Тесты для сканера строк
+///
 class TimeStampFromStringTest : public ::testing::Test {
 public:
 	TimeStampFromStringTest() {};
@@ -32,6 +34,7 @@ TEST_F(TimeStampFromStringTest, format24_basicTest3)
 	ASSERT_TRUE(tsfs.getHour() == 23 && tsfs.getMinute() == 59);
 }
 
+// Некорректный ввод:
 TEST_F(TimeStampFromStringTest, format24_exception_empty) 
 {
 	ASSERT_THROW(tsfs.scan(""), std::exception);	
@@ -82,6 +85,10 @@ TEST_F(TimeStampFromStringTest, format12_exception_wrong_modifier)
 	ASSERT_THROW(tsfs.scan("13:59 AD"), std::exception);	
 }
 
+
+///
+/// Тесты для Часов
+///
 class ClockTest : public ::testing::Test {
 public:
 	ClockTest(): times(CTimeStamp(0,0)), c(CClock(&times,CClock::Mechanic)) {};
@@ -89,8 +96,6 @@ protected:
 	CClock c;
 	CTimeStamp times;
 };
-
-
 
 TEST_F(ClockTest, BasicCountAngleTest1) 
 {
