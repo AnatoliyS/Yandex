@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Yandex", "Yandex\Yandex.vcxproj", "{01EB2710-1C2F-45DE-ADB9-B2C617FD2BBA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\UnitTests.vcxproj", "{FD5DA08B-EF71-4701-B6E9-130F65612CF5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{01EB2710-1C2F-45DE-ADB9-B2C617FD2BBA} = {01EB2710-1C2F-45DE-ADB9-B2C617FD2BBA}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01EB2710-1C2F-45DE-ADB9-B2C617FD2BBA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{01EB2710-1C2F-45DE-ADB9-B2C617FD2BBA}.Debug|Win32.Build.0 = Debug|Win32
+		{01EB2710-1C2F-45DE-ADB9-B2C617FD2BBA}.Release|Win32.ActiveCfg = Release|Win32
+		{01EB2710-1C2F-45DE-ADB9-B2C617FD2BBA}.Release|Win32.Build.0 = Release|Win32
+		{FD5DA08B-EF71-4701-B6E9-130F65612CF5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FD5DA08B-EF71-4701-B6E9-130F65612CF5}.Debug|Win32.Build.0 = Debug|Win32
+		{FD5DA08B-EF71-4701-B6E9-130F65612CF5}.Release|Win32.ActiveCfg = Release|Win32
+		{FD5DA08B-EF71-4701-B6E9-130F65612CF5}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
